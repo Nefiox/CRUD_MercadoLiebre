@@ -2,6 +2,8 @@ const fs = require('fs');
 const path = require('path');
 
 const productsFilePath = path.join(__dirname, '../data/productsDataBase.json');
+
+// LA BASE DE DATOS TIENE FORMATO JSON, SE "PARSEA" PARA PODER LEERLA. {encoding: 'utf-8'}
 const products = JSON.parse(fs.readFileSync(productsFilePath, 'utf-8'));
 
 
@@ -45,6 +47,8 @@ const controller = {
 		// AGREGA UN NUEVO OBJETO (NUEVO PRODUCTO) EN LA LISTA PRODUCTS
 		// EL NUEVO OBJETO INCLUYE LOS VALORES QUE SE ENVIARON EN EL FORMULARIO
 		// TAMBIÉN SE AGREGA EL 'id' E 'image'
+		// EL ID DEL NUEVO PRODUCTO ES LA SUMA DE LA LONGITUD DEL ARRAY DE PRODUCTOS + 1
+		// LA IMÁGEN PUEDE SER CUALQUIERA
 		const newProduct = products.push({...productInfo, id: products.length + 1, image: "img-home-theater-sony.jpg"});
 
 		// REESCRIBE LA BASE DE DATOS CON LOS NUEVOS VALORES
