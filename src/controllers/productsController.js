@@ -10,74 +10,116 @@ const toThousand = n => n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 const controller = {
 	// Root - Show all products
 	index: (req, res) => {
-        res.render('products', { products });
-		// Do the magic
+		// RENDERIZA LA VISTA 'products' Y ENVÍA EL OBJETO 'products'
+		// ES DECIR, TODOS LOS PRODUCTOS
+        res.render('products', { products });	
 	},
 
 	// Detail - Detail from one product
 	detail: (req, res) => {
+		// OBTIENE EL PARÁMETRO DE LA RUTA (:id)
 		const productId = parseInt(req.params.id);
+
+		// BUSCA UN PRODUCTO EL CUAL SU ID COINCIDA CON EL PARÁMETRO ':id'
+		// EL RESULTADO ES UN OBJETO
 		const productSelected = products.find((producto) => {
 			return producto.id == (productId)
 		});
 
+		// RENDERIZA LA VISTA 'detail' Y ENVÍA EL OBJETO 'productSelected'
 		res.render('detail', { productSelected })
-		// Do the magic
 	},
 
 	// Create - Form to create
 	create: (req, res) => {
+		// RENDERIZA LA VISTA 'product-create-form' (FORMULARIO DE EDICIÓN DE PRODUCTO)
 		res.render('product-create-form');
-		// Do the magic
+		
 	},
 	
 	// Create -  Method to store
 	store: (req, res) => {
+		// OBTIENE LOS DATOS DEL FORMULARIO (A LA HORA DE ENVIARSE)
 		const productInfo = req.body;
 
+		// AGREGA UN NUEVO OBJETO (NUEVO PRODUCTO) EN LA LISTA PRODUCTS
+		// EL NUEVO OBJETO INCLUYE LOS VALORES QUE SE ENVIARON EN EL FORMULARIO
+		// TAMBIÉN SE AGREGA EL 'id' E 'image'
 		const newProduct = products.push({...productInfo, id: products.length + 1, image: "img-home-theater-sony.jpg"});
 
+		// REESCRIBE LA BASE DE DATOS CON LOS NUEVOS VALORES
+		// JSON.stringify CONVIERTE UN OBJETO A UN JSON.
+		// JSON.stringify(valor, replacer, space) --> JSON.stringify(products, null, 2);
 		fs.writeFileSync(productsFilePath, JSON.stringify(products, null, 2));
 
+		// REDIRIGE HACIA LA LISTA DE TODOS LOS PRODUCTOS
 		res.redirect('/products');
-		// Do the magic
 	},
 
 	// Update - Form to edit
 	edit: (req, res) => {
+		// OBTIENE EL PARÁMETRO DE LA RUTA (:id)
 		const productId = parseInt(req.params.id);
+
+		// BUSCA UN PRODUCTO EL CUAL SU ID COINCIDA CON EL PARÁMETRO ':id'
+		// EL RESULTADO ES UN OBJETO
 		const productToEdit = products.find((producto) => {
 			return producto.id === productId;
 		})
+
+		// RENDERIZA LA VISTA 'product-edit-form' Y ENVÍA EL OBJETO 'productToEdit'
 		res.render('product-edit-form', { productToEdit });
-		// Do the magic
 	},
+
 	// Update - Method to update
 	update: (req, res) => {
-		const productInfo = req.body; // RECIBIR LA INFO DEL FORMULARIO 
-		const productIndex = products.findIndex ((producto) => { // ENCONTRAR EL ÍNDICE DEL PRODUCTO QUE SE DESEA MODIFICAR, Y QUE ESE ÍNDICE DEBE SER IGUAL AL PRODUCTO DESEADO (req.params.id)
+		// OBTIENE LOS DATOS DEL FORMULARIO (A LA HORA DE ENVIARSE)
+		const productInfo = req.body;
+
+		// DENTRO DEL ARRAY DE PRODUCTOS SE BUSCA ÉL ÍNDICE DEL PRODUCTO QUE SE DESEA MODIFICAR
+		// PARA ELLO, LA CONDICIÓN ES QUE EL ID DEL PRODUCTO A MODIFICAR DEBE SER IGUAL AL
+		// PARÁMETRO ':id' (EL PRODUCTO QUE EL USUARIO DESEA CAMBIAR)
+		// EL RESULTADO ARROJA UN ÍNDICE (POSICIÓN DENTRO DEL ARRAY)
+		const productIndex = products.findIndex ((producto) => {
 			return producto.id === parseInt(req.params.id);
 		});
-		products[productIndex] = {...products[productIndex], ...productInfo}; // EL PRODUCTO (OBJETO) CON EL INDEX DEL PRODUCTO ENCONTRADO VA A REEMPLAZAR SUS VALORES ANTERIORES CON LOS NUEVOS, ES DECIR, ...products[productIndex] (VALORES ANTERIORES) --> ...productInfo (VALORES NUEVOS DEL OBJETO).
 
+		// SELECCIONA OBJETO (PRODUCTO) CON SU ÍNDICE Y SE LE ASIGNA UN NUEVO OBJETO EL CUAL
+		// VA A CONTENER Y REEMPLAZAR LOS VALORES DEL PRODUCTO SELECCIONADO
+		// ES DECIR:
+		// ...products[productIndex] (VALORES ANTERIORES)
+		// ...productInfo (VALORES NUEVOS)
+		products[productIndex] = {...products[productIndex], ...productInfo};
+
+		// REESCRIBE LA BASE DE DATOS CON LOS NUEVOS VALORES
 		fs.writeFileSync(productsFilePath, JSON.stringify(products, null, 2)); // REESCRIBIMOS LA BD
 
-		res.redirect('/products'); // REDIRECCIONAMOS A LISTA DE PRODUCTOS
-		// Do the magic
+		// REDIRIGE HACIA LA LISTA DE TODOS LOS PRODUCTOS
+		res.redirect('/products');
 	},
 
 	// Delete - Delete one product from DB
 	destroy : (req, res) => {
-		const productInfo = req.body; // RECIBIR LA INFO DEL FORMULARIO 
-		const productIndex = products.findIndex ((producto) => { // ENCONTRAR EL ÍNDICE DEL PRODUCTO QUE SE DESEA ELIMINAR Y ESE ÍNDICE DEBE SER IGUAL AL PRODUCTO DESEADO (req.params.id)
+		// OBTIENE LOS DATOS DEL PRODUCTO (A LA HORA DE ENVIARSE)
+		const productInfo = req.body;
+
+		// SE BUSCA ÉL ÍNDICE DEL PRODUCTO QUE SE DESEA ELIMINAR
+		// LA CONDICIÓN ES QUE EL ID DEL PRODUCTO A ELIMINAR DEBE SER IGUAL AL
+		// PARÁMETRO ':id' (EL PRODUCTO QUE EL USUARIO DESEA ELIMINAR)
+		// EL RESULTADO ARROJA UN ÍNDICE (POSICIÓN DENTRO DEL ARRAY)
+		const productIndex = products.findIndex ((producto) => {
 			return producto.id === parseInt(req.params.id);
 		});
-		products.splice(productIndex, 1); // ELIMINA ELEMENTO DE UN ARRAY PASANDOLE EL INDEX DEL PRODUCTO A ELIMINAR
-		fs.writeFileSync(productsFilePath, JSON.stringify(products, null, 2)); // REESCRIBIMOS LA BD
 
+		// ELIMINA UN ELEMENTO DE UN ARRAY
+		// array.splice(índice inicial, núm de elementos a eliminar)
+		products.splice(productIndex, 1);
+
+		// REESCRIBE LA BASE DE DATOS CON LOS NUEVOS VALORES (CON EL PRODUCTO ELIMINADO)
+		fs.writeFileSync(productsFilePath, JSON.stringify(products, null, 2));
+
+		// REDIRIGE HACIA LA LISTA DE TODOS LOS PRODUCTOS
 		res.redirect('/products')
-
-		// Do the magic
 	}
 };
 

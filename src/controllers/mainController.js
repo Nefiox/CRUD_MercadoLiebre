@@ -9,17 +9,19 @@ const toThousand = n => n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 const controller = {
 	index: (req, res) => {
 		// const visitados = products.filter(producto => producto.category === "visited");
+
+		// FILTRA LOS PRODUCTOS CON LA CATEGORÍA "VISITED" (ARRAY DE OBJETOS)
 		const visitados = products.filter((producto) => {
 			return producto.category === "visited";
 		});
 
+		// FILTRA LOS PRODUCTOS CON LA CATEGORÍA "IN SALE" (ARRAY DE OBJETOS)
 		const inSale = products.filter((producto) => {
 			return producto.category === "in-sale";
 		})
 
+		// RENDERIZA LA VISTA 'INDEX' Y ENVÍA LOS OBJETOS (visitados, inSale)
 		res.render('index', {visitados, inSale});
-
-		// Do the magic
 	},
 	search: (req, res) => {
 		// Do the magic
