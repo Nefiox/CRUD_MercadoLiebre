@@ -21,10 +21,19 @@ const controller = {
 		})
 
 		// RENDERIZA LA VISTA 'INDEX' Y ENVÍA LOS OBJETOS (visitados, inSale)
-		res.render('index', {visitados, inSale});
+		res.render('index', { visitados, inSale });
 	},
 	search: (req, res) => {
-		// Do the magic
+		// RECIBE LAS PALABRAS DE LA BÚSQUEDA
+		const { keywords } = req.query;
+
+		// FILTRA LOS PRODUCTOS DE ACUERDO A LA BÚSQUEDA
+		const resultados = products.filter(({description, name}) => {
+			return description.includes(keywords) || name.includes(keywords);
+		});
+
+		// RENDERIZA LA VISTA 'RESULTS' Y ENVÍA LOS OBJETOS (results, keywords)
+		res.render('results', { resultados, keywords });
 	},
 };
 
