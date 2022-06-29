@@ -7,3 +7,5 @@
 - Crear un producto: `/products/create`
 - Editar un producto: `/products/:id/edit`
 - Borrar un producto: `/products/detail/:id`
+
+**[→ Live project](https://crudmercadoliebre.herokuapp.com/)**
